@@ -18,6 +18,12 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             "FROM tb_sales " +
             "INNER JOIN tb_seller ON tb_sales.seller_id = tb_seller.id " +
             "WHERE tb_sales.date >= :min AND tb_sales.date <= :max " +
+            "AND UPPER(tb_seller.name) LIKE UPPER(CONCAT('%',:name,'%'))",
+            countQuery =
+            "SELECT COUNT(*) " +
+            "FROM tb_sales " +
+            "INNER JOIN tb_seller ON tb_sales.seller_id = tb_seller.id " +
+            "WHERE tb_sales.date >= :min AND tb_sales.date <= :max " +
             "AND UPPER(tb_seller.name) LIKE UPPER(CONCAT('%',:name,'%'))")
     Page<SaleReportProjection> getReport(LocalDate min, LocalDate max, String name, Pageable pageable);
 
@@ -27,5 +33,5 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             "INNER JOIN tb_sales ON tb_sales.seller_id = tb_seller.id " +
             "WHERE tb_sales.date >= :minDate AND tb_sales.date <= :maxDate " +
             "GROUP BY sellerName")
-    Page<SaleSummaryProjection> getSummary(LocalDate minDate, LocalDate maxDate, Pageable pageable);
+    List<SaleSummaryProjection> getSummary(LocalDate minDate, LocalDate maxDate);
 }

@@ -40,17 +40,18 @@ public class SaleService {
         LocalDate defaultDate = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
         LocalDate dateMax = parseOrDefaultDate(max, defaultDate);
         LocalDate dateMin = parseOrDefaultDate(min, dateMax.minusYears(1L));
+        if (name == null || name.isEmpty()) name = "";
         Page<SaleReportProjection> projections = repository.getReport(dateMin, dateMax, name, pageable);
         return projections.map(SaleReportDTO::new);
     }
 
     @Transactional(readOnly = true)
-    public Page<SaleSummaryDTO> getSummary(String min, String max, Pageable pageable) {
+    public List<SaleSummaryDTO> getSummary(String min, String max, Pageable pageable) {
         LocalDate defaultDate = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
         LocalDate dateMax = parseOrDefaultDate(max, defaultDate);
         LocalDate dateMin = parseOrDefaultDate(min, dateMax.minusYears(1L));
-        Page<SaleSummaryProjection> projections = repository.getSummary(dateMin, dateMax, pageable);
-        return projections.map(SaleSummaryDTO::new);
+        List<SaleSummaryProjection> projections = repository.getSummary(dateMin, dateMax);
+        return projections.stream().map(SaleSummaryDTO::new).collect(Collectors.toList());
     }
 
     private LocalDate parseOrDefaultDate(String dateStr, LocalDate defaultDate) {
